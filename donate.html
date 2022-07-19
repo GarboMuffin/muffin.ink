@@ -2,11 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="utf8">
-    <title>Support GarboMuffin's open source development</title>
+    <title>Support GarboMuffin's open source projects</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="monetization" content="$ilp.uphold.com/gF2KGUfLzqAR">
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Support GarboMuffin's open source development" />
+    <meta property="og:title" content="Support GarboMuffin's open source projects" />
     <meta property="og:url" content="https://muffin.ink/donate" />
     <link rel="canonical" href="https://muffin.ink/donate" />
     <meta name="referrer" content="none">
@@ -63,12 +63,15 @@
         flex-wrap: wrap;
       }
       .platforms > * {
-        width: 120px;
+        width: 100px;
         margin: 0 4px;
         text-align: center;
         display: flex;
         flex-direction: column;
         align-items: center;
+      }
+      .platforms > *:first-child:last-child {
+        width: 100%;
       }
       .platforms a {
         display: flex;
@@ -93,7 +96,7 @@
   <body>
     <main>
       <h1 class="title">
-        <div>Buy me a coffee</div>
+        <div>Support my work</div>
         <!-- Icon from: https://github.com/google/material-design-icons License: https://github.com/google/material-design-icons/blob/master/LICENSE -->
         <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48" aria-hidden="true"><path d="M24 41.95 21.95 40.1Q13.8 32.65 8.9 27.1Q4 21.55 4 15.85Q4 11.35 7.025 8.325Q10.05 5.3 14.5 5.3Q17.05 5.3 19.55 6.525Q22.05 7.75 24 10.55Q26.2 7.75 28.55 6.525Q30.9 5.3 33.5 5.3Q37.95 5.3 40.975 8.325Q44 11.35 44 15.85Q44 21.55 39.1 27.1Q34.2 32.65 26.05 40.1Z" fill="#F44336"/></svg>
       </h1>
@@ -123,25 +126,27 @@
         <div>
           <a href="https://github.com/sponsors/GarboMuffin/">
             <img src="github.png" class="invert-in-dark-mode" alt="">
-            <div>GitHub</div>
+            <div>Donate on GitHub</div>
           </a>
-          <div class="small">Lowest fees!</div>
+          <!-- <div class="small">Lowest fees!</div> -->
         </div>
 
-        <div>
+        <!-- <div>
           <a href="https://ko-fi.com/inkmuffin">
             <img src="kofi.png" alt="">
             <div>Ko-fi</div>
           </a>
-        </div>
+        </div> -->
 
-        <div>
+        <!-- <div>
           <a href="https://paypal.me/inkmuffin">
             <img src="paypal.png" alt="">
             <div>PayPal</div>
           </a>
-        </div>
+        </div> -->
       </div>
+
+      <p>GitHub covers the transaction fee so 100% of your donation goes to me.</p>
 
       <p class="brave-rewards" hidden>This page and <a href="https://turbowarp.org/">turbowarp.org</a> also accept Brave Rewards.</p>
       <script>
