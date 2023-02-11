@@ -18,12 +18,14 @@
         <script>
             function update() {
                 const gamepads = navigator.getGamepads();
-                let out = 'Press buttons on the controller to make it show up.\n';
+                let out = 'Press buttons on the controller to make it show up.\n\n';
+
+                out += `User agent: ${navigator.userAgent}\n\n`;
 
                 for (let a = 0; a < gamepads.length; a++) {
                     const gamepad = gamepads[a];
                     if (!gamepad) {
-                        out += `Gamepad #${a} not connected\n`;
+                        out += `Gamepad #${a} not connected\n\n`;
                         continue;
                     }
 
@@ -32,7 +34,7 @@
                     out += `  buttons: ${gamepad.buttons.length}\n`
                     for (let i = 0; i < gamepad.buttons.length; i++) {
                         const b = gamepad.buttons[i];
-                        out += `    #${i}: pressed: ${b.pressed} value: ${b.value} pressed: ${b.pressed}\n`;
+                        out += `    #${i}: pressed: ${b.pressed} value: ${b.value} touched: ${b.touched}\n`;
                     }
 
                     out += `  axes: ${gamepad.axes.length}\n`;
@@ -56,7 +58,11 @@
                     } else {
                         out += `  vibrationActuator: unsupported\n`;
                     }
+
+                    out += '\n';
                 }
+
+                out = out.trim();
 
                 const element = document.querySelector('#out');
                 const old = element.textContent;
