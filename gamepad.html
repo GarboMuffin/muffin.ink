@@ -23,7 +23,7 @@
                 for (let a = 0; a < gamepads.length; a++) {
                     const gamepad = gamepads[a];
                     if (!gamepad) {
-                        out += `Gamepad #${a} is null\n`;
+                        out += `Gamepad #${a} not connected\n`;
                         continue;
                     }
 
@@ -52,7 +52,7 @@
                     }
 
                     if (gamepad.vibrationActuator) {
-                        out += `  vibrationActuator: type: ${gamepad.vibrationActuator.type}`;
+                        out += `  vibrationActuator: type: ${gamepad.vibrationActuator.type}\n`;
                     } else {
                         out += `  vibrationActuator: unsupported\n`;
                     }
