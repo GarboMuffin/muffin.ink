@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf8">
+        <title>Gamepads</title>
+        <meta name="robots" content="noindex">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style>
+            #out {
+                font-family: monospace;
+                white-space: pre;
+                font-size: 1rem;
+            }
+        </style>
+    </head>
+    <body>
+        <p id="out"></p>
+        <script>
+            function update() {
+                const gamepads = navigator.getGamepads();
+                let out = 'Press buttons on the controller to make it show up.\n';
+
+                for (let a = 0; a < gamepads.length; a++) {
+                    const gamepad = gamepads[a];
+                    if (!gamepad) {
+                        out += `Gamepad #${a} is null\n`;
+                        continue;
+                    }
+
+                    out += `Gamepad #${a} id: ${gamepad.id} connected: ${gamepad.connected} timestamp: ${gamepad.timestamp} mapping: ${gamepad.mapping}\n`;
+
+                    out += `  buttons: ${gamepad.buttons.length}\n`
+                    for (let i = 0; i < gamepad.buttons.length; i++) {
+                        const b = gamepad.buttons[i];
+                        out += `    #${i}: pressed: ${b.pressed} value: ${b.value} pressed: ${b.pressed}\n`;
+                    }
+
+                    out += `  axes: ${gamepad.axes.length}\n`;
+                    for (let i = 0; i < gamepad.axes.length; i++) {
+                        const a = gamepad.axes[i];
+                        out += `    #${i}: ${a}\n`;
+                    }
+
+                    if (gamepad.hapticActuators) {
+                        out += `  hapticActuators: ${gamepad.hapticActuators.length}\n`;
+                        for (let i = 0; i < gamepad.hapticActuators.length; i++) {
+                            const act = gamepad.hapticActuators[i];
+                            out += `    #${i} ${act.type}\n`;
+                        }
+                    } else {
+                        out += `  hapticActuators: unsupported\n`;
+                    }
+
+                    if (gamepad.vibrationActuator) {
+                        out += `  vibrationActuator: type: ${gamepad.vibrationActuator.type}`;
+                    } else {
+                        out += `  vibrationActuator: unsupported\n`;
+                    }
+                }
+
+                const element = document.querySelector('#out');
+                const old = element.textContent;
+                if (out !== old) {
+                    element.textContent = out;
+                }
+
+                requestAnimationFrame(update);
+            }
+
+            update();
+        </script>
+    </body>
+</html>
