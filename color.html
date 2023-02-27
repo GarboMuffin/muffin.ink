@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="robots" content="noindex">
+    </head>
+    <body>
+        <script>
+            const update = () => {
+                const color = location.hash;
+                document.body.style.backgroundColor = color;
+            };
+            addEventListener('hashchange', update);
+            update();
+        </script>
+    </body>
+</html>
