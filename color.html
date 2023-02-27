@@ -10,6 +10,9 @@
                 document.body.style.backgroundColor = color;
             };
             addEventListener('hashchange', update);
+            addEventListener('mousedown', () => {
+                document.documentElement.requestFullscreen();
+            })
             update();
         </script>
     </body>
