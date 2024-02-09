@@ -1,5 +1,7 @@
 image: alpine/edge
 oauth: pages.sr.ht/PAGES:RW
+secrets:
+- aed04503-7a99-4335-810c-e5d0249d9fbb # ssh key
 packages:
 - hut
 environment:
