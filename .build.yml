@@ -9,7 +9,7 @@ environment:
 tasks:
 - package: |
     cd $site
-    tar -cvz . > ../site.tar.gz
+    tar -cvz --exclude=.git . > ../site.tar.gz
 - upload: |
     hut pages publish -d $site site.tar.gz
     hut pages publish -d www.$site site.tar.gz
