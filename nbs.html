@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<!--
+
+As I write this comment it is February 2024.
+The NBS handling is based on code I wrote in late 2018: https://github.com/GarboMuffin/nbsplayer/
+The song code generation was originally written in summer 2020.
+As you can imagine there's a lot of things I would do differently now, but oh well. Here we are.
+I don't really care enough to change it. It works.
+
+License:
+Copyright (C) 2018-2024 Thomas Weber
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf8">
+    <title>NBS converter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="nbsplayer/favicon.ico">
+    <style>
+      :root {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+      main {
+        max-width: 600px;
+        margin: auto;
+      }
+      a {
+        color: blue;
+      }
+      a:active {
+        color: red;
+      }
+      .section {
+        display: block;
+        margin-bottom: 16px;
+      }
+      input[type=file] {
+        width: 100%;
+        box-sizing: border-box;
+      }
+      input[type=text] {
+        width: 300px;
+        box-sizing: border-box;
+      }
+      textarea {
+        width: 250px;
+        height: 70px;
+        box-sizing: border-box;
+      }
+      .copyhint {
+        margin-left: 10px;
+        height: 30px;
+      }
+      .privacy {
+        font-size: small;
+        opacity: 0.8;
+      }
+      hr {
+        margin: 16px 0;
+        border-style: solid;
+        border-color: #ccc;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          background: #111;
+          color: #eee;
+        }
+        a {
+          color: #4af;
+        }
+        hr {
+          border-color: #555;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <main>
+      <p>This parses Note Block Studio (NBS) song files so that <a href="https://scratch.mit.edu/projects/569447364/" target="_blank" rel="noopener noreferrer">the Scratch project</a> can interpret them because Scratch projects can't really read binary files.</p>
+      <p>Select a .NBS file in the input below, then copy and paste the textbox underneath into the input in the Scratch project using the "Custom Song" option.</p>
+
+      <hr>
+
+      <div class="section">
+        <!-- add `multiple` to select multiple files. The output will be something you can import to Scratch through right click > import -->
+        <input type="file" accept=".nbs">
+      </div>
+
+      <label class="section">
+        Song name:
+        <input class="song-name" type="text" placeholder="(Will be detected automatically)" value="" autocomplete="off">
+      </label>
+      <label class="section">
+        Song author:
+        <input class="song-author" type="text" placeholder="(Will be detected automatically)" value="" autocomplete="off">
+      </label>
+      <label class="section">
+        Note blocks by:
+        <input class="notes-by" type="text" placeholder="(Will be detected automatically)" value="" autocomplete="off">
+      </label>
+
+      <div class="section" style="display: flex; align-items: center;">
+        <textarea
+          autocomplete="off"
+          readonly
+          onclick="this.focus();this.select();"
+          placeholder="(Result will be available here)"
+        ></textarea>
+        <button class="copyhint" hidden>
+          &lt;&lt;&lt; Copy and paste this text!
+        </button>
+      </div>
+
+      <hr>
+
+      <ul>
+        <li>Instruments last updated for Minecraft 1.18.2.</li>
+        <li>Layer volume is not supported.</li>
+        <li>Custom instruments are not supported.</li>
+        <li>OpenNBS "Velocity", "Pitch", and "Pan" are not supported.</li>
+      </ul>
+
+      <p class="privacy">Files are processed locally on your computer and are never uploaded to a server.</p>
+    </main>
+
+    <script>
+      // imported from https://github.com/GarboMuffin/nbsplayer/blob/master/src/NBS.js
+      /**
+       * Represents a song.
+       */
+      class Song {
+        constructor() {
+          /**
+           * The name (or title) of this song.
+           */
+          this.name = "";
+          /**
+           * The author of this song.
+           */
+          this.author = "";
+          /**
+           * The original author of this song.
+           */
+          this.originalAuthor = "";
+          /**
+           * The song's description.
+           */
+          this.description = "";
+
+          /**
+           * Layers of the song
+           */
+          this.layers = [];
+          /**
+           * The tempo of the song in ticks per second.
+           */
+          this.tempo = 5;
+          /**
+           * The length of the longest layer of the song.
+           */
+          this.size = 0;
+
+          /**
+           * The current playing tick of a song.
+           * Can contain decimals.
+           */
+          this.currentTick = 0;
+          /**
+           * Is the song paused? (as in, not playing)
+           */
+          this.paused = true;
+          /**
+           * The song's time signature.
+           */
+          this.timeSignature = 4;
+          /**
+           * The minutes spent editing the song.
+           */
+          this.minutesSpent = 0;
+          /**
+           * The total left clicks of the song.
+           */
+          this.leftClicks = 0;
+          /**
+           * The total right clicks of the song.
+           */
+          this.rightClicks = 0;
+          /**
+           * Blocks added to the song.
+           */
+          this.blocksAdded = 0;
+          /**
+           * Blocks removed from the song.
+           */
+          this.blocksRemoved = 0;
+          /**
+           * The name of the MIDI or schematic that this song was imported from.
+           */
+          this.midiName = "";
+          /**
+           * The instruments of the song.
+           */
+          this.instruments = Instrument.builtin;
+        }
+
+        /**
+         * Adds a new layer to the song and returns it.
+         */
+        addLayer() {
+          const layer = new Layer(this, this.layers.length + 1);
+          this.layers.push(layer);
+          return layer;
+        }
+
+        /**
+         * Deletes a layer from the song.
+         */
+        deleteLayer(layer) {
+          const index = this.layers.indexOf(layer);
+          this.layers.splice(index, 1);
+        }
+
+        /**
+         * Plays the song.
+         * If the song is ended then it will be restarted.
+         */
+        play() {
+          if (this.currentTick >= this.size) {
+            this.currentTick = 0;
+          }
+          this.paused = false;
+        }
+
+        /**
+         * Pauses the song
+         */
+        pause() {
+          this.paused = true;
+        }
+
+        /**
+         * The time that each takes, in milliseconds.
+         */
+        get timePerTick() {
+          return 20 / this.tempo * 50;
+        }
+
+        /**
+         * The current time, in milliseconds, of the song.
+         */
+        get currentTime() {
+          return this.currentTick * this.timePerTick;
+        }
+
+        /**
+         * The length of the song in milliseconds.
+         */
+        get endTime() {
+          return this.size * this.timePerTick;
+        }
+
+        /**
+         * Gets the currently active tick in the song.
+         * Will not contain decimals.
+         */
+        get tick() {
+          return Math.floor(this.currentTick);
+        }
+      }
+
+      /**
+       * Represents a layer in a song
+       */
+      class Layer {
+        constructor(song, id) {
+          /**
+           * The parent song of this layer.
+           */
+          this.song = song;
+          /**
+           * The name of this layer.
+           */
+          this.name = "";
+          /**
+           * The volume of this layer.
+           * A number between 0 and 1.
+           */
+          this.volume = 1;
+          /**
+           * The notes within this layer.
+           * Not all indexes will have a note.
+           */
+          this.notes = [];
+          /**
+           * The ID of this layer.
+           * Is not guaranteed to be unique.
+           */
+          this.id = id;
+        }
+
+        /**
+         * Deletes this layer.
+         */
+        delete() {
+          this.song.deleteLayer(this);
+        }
+
+        /**
+         * Sets the note at a given tick with a given key and instrument.
+         * Automatically expands the song's size if it has now grown.
+         */
+        setNote(tick, key, instrument) {
+          if (tick + 1 > this.song.size) {
+            this.song.size = tick + 1;
+          }
+          const note = new Note(this, tick);
+          note.key = key;
+          note.instrument = instrument;
+          this.notes[tick] = note;
+          return note;
+        }
+
+        /**
+         * Deletes the tick at a given tick in the song.
+         * Does not automatically shrink the song if it has now shrunk in size.
+         */
+        deleteNote(tick) {
+          delete this.notes[tick];
+        }
+
+        /**
+         * The placeholder name of this layer.
+         */
+        get placeholder() {
+          return "Layer " + this.id;
+        }
+      }
+
+      /**
+       * Represents a note in a song
+       */
+      class Note {
+        constructor(layer, tick) {
+          /**
+           * The layer this note is in
+           */
+          this.layer = layer;
+          /**
+           * The tick that the note lives in
+           */
+          this.tick = tick;
+          /**
+           * The key of the note.
+           */
+          this.key = 45; // F#4
+          /**
+           * The instrument of the note.
+           * TODO: null is not a good default value
+           */
+          this.instrument = null;
+          /**
+           * The last time the note was played.
+           * TODO: does this need to be here?
+           */
+          this.lastPlayed = null;
+        }
+      }
+
+      /**
+       * Represents an instrument
+       */
+      class Instrument {
+        constructor(name, id, pressKey) {
+          /**
+           * The name of the instrument
+           */
+          this.name = name;
+          /**
+           * The ID of the instrument
+           */
+          this.id = id;
+          this.pressKey = pressKey;
+        }
+      }
+
+      /**
+       * Builtin instruments
+       */
+      Instrument.builtin = [
+        // Vue will set the correct sources and sometimes inline images using require()
+        new Instrument(
+          "Harp",
+          0,
+          true
+        ),
+        new Instrument(
+          "Double Bass",
+          1,
+          false
+        ),
+        new Instrument(
+          "Bass Drum",
+          2,
+          false
+        ),
+        new Instrument(
+          "Snare Drum",
+          3,
+          false
+        ),
+        new Instrument(
+          "Click",
+          4,
+          false
+        ),
+        new Instrument(
+          "Guitar",
+          5,
+          false
+        ),
+        new Instrument(
+          "Flute",
+          6,
+          false
+        ),
+        new Instrument(
+          "Bell",
+          7,
+          false
+        ),
+        new Instrument(
+          "Chime",
+          8,
+          false
+        ),
+        new Instrument(
+          "Xylophone",
+          9,
+          false
+        ),
+        new Instrument(
+          "Iron Xylophone",
+          10,
+        ),
+        new Instrument(
+          "Cow Bell",
+          11,
+        ),
+        new Instrument(
+          "Didgeridoo",
+          12,
+        ),
+        new Instrument(
+          "Bit",
+          13,
+        ),
+        new Instrument(
+          "Banjo",
+          14,
+        ),
+        new Instrument(
+          "Pling",
+          15,
+        ),
+      ];
+
+      /**
+       * Parses an array buffer containg the bytes of a .nbs file as a Song.
+       */
+      Song.fromArrayBuffer = function songFromArrayBuffer(arrayBuffer) {
+        // https://www.stuffbydavid.com/mcnbs/format
+
+        const song = new Song();
+        const viewer = new DataView(arrayBuffer);
+        let currentByte = 0;
+
+        /**
+         * Reads a signed byte from the buffer and advances the current byte by 1.
+         */
+        function readByte() {
+          const result = viewer.getInt8(currentByte, true);
+          currentByte += 1;
+          return result;
+        }
+
+        /**
+         * Reads an unsigned byte form the buffer and advances the current byte by 1.
+         */
+        function readUnsignedByte() {
+          const result = viewer.getUint8(currentByte, true);
+          currentByte += 1;
+          return result;
+        }
+
+        /**
+         * Reads a signed 2 byte number (eg. a short) from the buffer and advanced the current byte by 2.
+         */
+        function readShort() {
+          const result = viewer.getInt16(currentByte, true);
+          currentByte += 2;
+          return result;
+        }
+
+        /**
+         * Reads a signed 4 byte number (eg. an integer) from the buffer and advanced the current byte by 4.
+         */
+        function readInt() {
+          const result = viewer.getInt32(currentByte, true);
+          currentByte += 4;
+          return result;
+        }
+
+        /**
+         * Reads a string from the buffer and advanced the current byte until the end of the string.
+         * Strings begin with a signed integer (the length), followed by that many bytes of the string's data.
+         */
+        function readString() {
+          const length = readInt();
+          let result = "";
+          for (let i = 0; i < length; i++) {
+            const byte = readUnsignedByte();
+            result += String.fromCharCode(byte);
+          }
+          return result;
+        }
+
+        const firstShort = readShort();
+        const newFormat = firstShort === 0;
+
+        // Header
+        if (newFormat) {
+          const version = readByte();
+          const vanillaInstrumentCount = readByte();
+          song.size = readShort();
+        } else {
+          song.size = firstShort;
+        }
+        const totalLayers = readShort();
+        song.name = readString();
+        song.author = readString();
+        song.originalAuthor = readString();
+        song.description = readString();
+        song.tempo = readShort() / 100; // tempo is stored as real tempo * 100
+        readByte(); // auto save enabled (0/1), unused by nbs.js
+        readByte(); // auto save duration in minutes, unused by nbs.js
+        song.timeSignature = readByte();
+        song.minutesSpent = readInt();
+        song.leftClicks = readInt();
+        song.rightClicks = readInt();
+        song.blocksAdded = readInt();
+        song.blocksRemoved = readInt();
+        song.midiName = readString();
+        if (newFormat) {
+          const looping = readByte();
+          const maxLoopCount = readByte();
+          const loopStartTick = readShort();
+        }
+
+        // Note Blocks
+        // The format website linked somewhere above does a much better job at explaining this than I could.
+        let currentTick = -1;
+        const rawNotes = [];
+        while (true) {
+          const jumpsToNextTick = readShort();
+          if (jumpsToNextTick === 0) {
+            break;
+          }
+          currentTick += jumpsToNextTick;
+          let currentLayer = -1;
+          while (true) {
+            const jumpsToNextLayer = readShort();
+            if (jumpsToNextLayer === 0) {
+              break;
+            }
+            currentLayer += jumpsToNextLayer;
+            const instrumentId = readByte();
+            const key = readByte();
+
+            if (newFormat) {
+              const velocity = readByte();
+              const panning = readByte();
+              const pitch = readShort();
+            }
+
+            // We'll process the raw note into a real Note object later.
+            rawNotes.push({
+              instrument: instrumentId,
+              key,
+              layer: currentLayer,
+              tick: currentTick,
+            });
+          }
+        }
+
+        // Layers (optional section)
+        if (arrayBuffer.byteLength > currentByte) {
+          for (let i = 0; i < totalLayers; i++) {
+            const layer = song.addLayer();
+            layer.name = readString();
+            if (newFormat) {
+              const lock = readByte();
+              layer.volume = readByte() / 100;
+              const stereo = readByte();
+            } else {
+              layer.volume = readByte() / 100;
+            }
+          }
+        }
+
+        // Process raw notes and convert them to real Note objects.
+        // Cannot be done while parsing because information about layers and other things might not exist yet.
+        for (const rn of rawNotes) {
+          // If a note is in a layer that doesn't exist, we will have to create the layers for it.
+          // For an example file that does this, see Friday.nbs in any NBS installation
+          if (rn.layer >= song.layers.length) {
+            while (rn.layer >= song.layers.length) {
+              song.addLayer();
+            }
+          }
+
+          const layer = song.layers[rn.layer];
+          const key = rn.key;
+          const tick = rn.tick;
+          const instrument = song.instruments[rn.instrument];
+
+          layer.setNote(tick, key, instrument);
+        }
+
+        return song;
+      };
+    </script>
+    <script>
+      const fileInput = document.querySelector('input[type=file]');
+      const outputTextarea = document.querySelector('textarea');
+      const copyHint = document.querySelector('.copyhint');
+
+      const songNameInput = document.querySelector('.song-name');
+      const songAuthorInput = document.querySelector('.song-author');
+      const notesByInput = document.querySelector('.notes-by');
+
+      const clean = (s) => s
+        // Scratch interprets ',' as a CSV delimeter and silently deletes everything after it when importing lists
+        .replace(/,/g, '')
+        // Special characters used by our export format
+        .replace(/#/g, '')
+        .replace(/`/g, '')
+        // Other characters that will probably break things
+        .replace(/\n/g, '')
+        .replace(/\r/g, '');
+
+      const readAsArrayBuffer = (file) => new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result);
+        fr.onerror = () => reject(new Error('Cannot read file'));
+        fr.readAsArrayBuffer(file);
+      });
+
+      const parseFileToSong = async (file) => {
+        const filename = file.name.split('.')[0];
+        const buffer = await readAsArrayBuffer(file);
+        const song = Song.fromArrayBuffer(buffer);
+        song.name = song.name || filename;
+        return song;
+      };
+
+      const parseSongToCode = (song) => {
+        let result = '@';
+
+        result += clean(songNameInput.value || song.name);
+        result += '`';
+        result += clean(notesByInput.value || song.author);
+        result += '`';
+        result += clean(songAuthorInput.value || song.originalAuthor);
+        result += '`';
+        result += song.tempo;
+        result += '`';
+        result += '#';
+
+        const instruments = [
+          // harp
+          11,
+          // dbass
+          7,
+          // bdrum
+          2,
+          // sdrum
+          14,
+          // click
+          4,
+          // guitar
+          10,
+          // flute
+          9,
+          // bell
+          3,
+          // chime
+          6,
+          // xylophone
+          15,
+          // iron_xylophone
+          12,
+          // cow_bell
+          5,
+          // didgeridoo
+          8,
+          // bit
+          16,
+          // banjo
+          1,
+          // pling
+          13,
+        ];
+
+        let noteDataSection = '';
+        let hasFoundOneNonEmptyTick = false;
+        for (var i = 0; i < song.size; i++) {
+          let tickData = '';
+          for (const layer of song.layers) {
+            const n = layer.notes[i];
+            if (n) {
+              tickData += instruments[n.instrument.id].toString().padStart(2, '0');
+              tickData += n.key.toString().padStart(2, '0').substr(0, 2);
+            } else {
+              tickData += ':';
+            }
+          }
+          tickData = tickData.trimEnd();
+          if (tickData.length !== 0 || hasFoundOneNonEmptyTick) {
+            hasFoundOneNonEmptyTick = true;
+            noteDataSection += tickData;
+            noteDataSection += '`';
+          }
+        }
+
+        noteDataSection = noteDataSection.trim();
+        result += noteDataSection;
+        result += '@';
+
+        return result;
+      };
+
+      const updateInputPlaceholders = (song) => {
+        const none = '(Unknown)';
+        songNameInput.placeholder = song.name || none;
+        notesByInput.placeholder = song.author || none;
+        songAuthorInput.placeholder = song.originalAuthor || none;
+      };
+
+      const processFiles = async (files) => {
+        try {
+          if (files.length === 0) {
+            throw new Error('No file selected');
+          }
+
+          outputTextarea.value = 'Loading...';
+          const result = await Promise.all(files.map(async (file, index) => {
+            const song = await parseFileToSong(file);
+            if (index === 0) {
+              updateInputPlaceholders(song);
+            }
+            return await parseSongToCode(song);
+          }));
+          outputTextarea.value = result.join('\n');
+
+          copyHint.hidden = false;
+          copyHint.style.width = `${copyHint.offsetWidth}px`;
+        } catch (e) {
+          console.error(e);
+          outputTextarea.value = `Error: ${e}\nSee console for more information.`;
+          alert(`Error: ${e}`);
+
+          // this promise should reject
+          throw e;
+        }
+      };
+
+      const loadFilesIfPresent = () => {
+        if (fileInput.files.length > 0) {
+          return processFiles(Array.from(fileInput.files));
+        }
+        return new Promise(() => {});
+      };
+
+      const highlightOutput = () => {
+        outputTextarea.focus();
+        outputTextarea.select();
+      };
+
+      for (const el of [songNameInput, songAuthorInput, notesByInput]) {
+        el.addEventListener('change', loadFilesIfPresent);
+      }
+
+      fileInput.addEventListener('change', () => {
+        loadFilesIfPresent().then(highlightOutput);
+      });
+
+      const isRelevantDataTransfer = (dataTransfer) => Array.from(dataTransfer.files)
+
+      document.body.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+      });
+      document.body.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileInput.files = e.dataTransfer.files;
+        loadFilesIfPresent().then(highlightOutput);
+      });
+
+      const copyHintOriginalText = copyHint.textContent;
+      let resetCopyHintTimeout;
+      copyHint.addEventListener('click', (e) => {
+        highlightOutput();
+        document.execCommand('copy');
+
+        copyHint.textContent = 'Copied!';
+        clearTimeout(resetCopyHintTimeout);
+        resetCopyHintTimeout = setTimeout(() => {
+          copyHint.textContent = copyHintOriginalText;
+        }, 1000);
+      });
+
+      // For browsers that persist the file input between reloads (Firefox)
+      loadFilesIfPresent();
+    </script>
+
+    <script>
+      if (typeof parseSongToCode !== 'function') {
+        alert('Error loading scripts, try updating your browser.');
+      }
+    </script>
+  </body>
+</html>
