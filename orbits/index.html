@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Orbital Motion Simulator</title>
+    <style>
+      :root {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color-scheme: dark;
+        overflow: hidden;
+      }
+      #canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: black;
+      }
+      #interface {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 200px;
+        box-sizing: border-box;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border-right: 1px solid rgba(255, 255, 255, 0.5);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        padding: 4px;
+        border-bottom-right-radius: 8px;
+        transition: transform .2s;
+      }
+      #interface.hidden {
+        transform: translateX(-100%);
+      }
+
+      .toggle-button {
+        transition: .2s opacity;
+      }
+      #interface.hidden .toggle-button {
+        opacity: 0;
+        transition: .2s opacity;
+        transition-delay: 2s;
+      }
+      #interface.hidden .toggle-button:hover {
+        opacity: 1;
+        transition: .2s opacity;
+      }
+
+      .option {
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+      .option:not(:last-child) {
+        margin-bottom: 4px;
+      }
+
+      button {
+        display: block;
+        color: white;
+        background: rgba(50, 50, 50);
+        border: 1px solid rgba(127, 127, 127);
+        box-sizing: border-box;
+        min-width: 30px;
+        min-height: 30px;
+        text-align: center;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: rgba(70, 70, 70);
+      }
+      button:active {
+        background: rgba(90, 90, 90);
+      }
+
+      .colored-ball {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        box-sizing: border-box;
+        border: 1px solid rgba(200, 200, 200);
+        border-radius: 100%;
+        margin-left: 4px;
+      }
+
+      select {
+        width: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="canvas"></canvas>
+    <script src="script.js"></script>
+
+    <div
+      id="interface"
+      hidden
+      x-data="{
+        open: true,
+        simulation
+      }"
+      x-bind:class="open ? '' : 'hidden'"
+    >
+      <div class="option">
+        <button
+          @click="simulation.toggleRunning()"
+          style="width: 100%;"
+          class="pause-button"
+        >
+          <div x-show="simulation.running">Pause</div>
+          <div x-show="!simulation.running">Resume</div>
+        </button>
+      </div>
+
+      <label
+        class="option"
+        style="
+          display: flex;
+          text-align: center;
+        "
+      >
+        <input
+          type="range"
+          min="-15"
+          value="15"
+          max="22"
+          step="0.1"
+          autocomplete="off"
+          style="
+            width: 130px;
+          "
+          x-init="simulation.setExponentialSpeed($el.value)"
+          @input="simulation.setExponentialSpeed(+$el.value)"
+        >
+        <div style="flex-grow: 1;">
+          <span
+            x-text="Math.round(simulation.getSpeedRelativeToRealtime() * 10) / 10"
+          ></span>x
+        </div>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" x-model="simulation.showVelocity">
+        <span>Show Velocity</span>
+        <div class="colored-ball" style="background: rgb(0, 0, 255);"></div>
+      </label>
+      <label class="option">
+        <input type="checkbox" x-model="simulation.showAcceleration">
+        <span>Show Acceleration</span>
+        <div class="colored-ball" style="background: rgb(255, 0, 0);"></div>
+      </label>
+      <label class="option">
+        <input type="checkbox" x-model="simulation.showTrails">
+        <span>Show Trails</span>
+        <div class="colored-ball" style="background: rgb(127, 127, 127);"></div>
+      </label>
+
+      <select
+        x-on:change="
+          simulation.loadPreset($el.value);
+          location.hash = $el.value;
+        "
+        x-init="
+          $el.value = location.hash.substr(1) || $el.value;
+          simulation.loadPreset($el.value);
+        "
+      >
+        <option value="none">None</option>
+        <option value="earth" selected>Earth, ISS, Moon</option>
+        <option value="projectile">Projectile</option>
+        <option value="collision">Collision</option>
+        <option value="ball-matrix">Ball Matrix</option>
+        <option value="ball-orbit">Orbiting Balls</option>
+      </select>
+
+      <button
+        class="toggle-button"
+        style="
+          position: absolute;
+          right: -5px;
+          top: 4px;
+          transform: translateX(100%);
+        "
+        @click="open = !open"
+      >
+        <div x-show="!open">&gt;&gt;</div>
+        <div x-show="open">&lt;&lt;</div>
+      </button>
+    </div>
+    <script src="alpine.js"></script>
+    <script>
+      document.getElementById('interface').hidden = false;
+      const pauseButton = document.querySelector('.pause-button');
+      document.addEventListener('keydown', (e) => {
+        if (e.key === ' ' && e.target === document.body) {
+          pauseButton.click();
+        }
+      });
+    </script>
+  </body>
+</html>
