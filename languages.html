@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf8">
+        <meta name="robots" content="noindex">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </head>
+    <body>
+        <pre id="out"></pre>
+        <script>
+            const out = document.getElementById('out');
+            out.textContent += `Primary language:\t${navigator.language}\n`
+            out.textContent += `Secondary languages:\t${navigator.languages.join(', ')}`;
+        </script>
+    </body>
+</html>
