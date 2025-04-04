@@ -27,9 +27,16 @@
           color: rgb(255, 126, 126);
         }
       }
-      main {
+      main, footer {
         max-width: 650px;
         margin: auto;
+      }
+      .ring {
+        text-align: center;
+      }
+      .ring a {
+        font-weight: bold;
+        text-decoration: none;
       }
     </style>
     {% block head %}
@@ -41,5 +48,13 @@
       {% block content %}
       {% endblock content %}
     </main>
+
+    <footer>
+      <div class="ring">
+        <a href="https://ring.umn.page/back?muffin.ink">&lt;-</a>
+        <span>blog ring</span>
+        <a href="https://ring.umn.page/next?muffin.ink">-&gt;</a>
+      </div>
+    </footer>
   </body>
 </html>
