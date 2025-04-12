@@ -177,7 +177,7 @@ This produces:
 
 <img src="example.png" width="518" height="376">
 
-Bananatron is comprised of three major components. The Bananatron injector accepts a path to an Electron app, then modifies the app's code to add code to the start of the app's main script:
+Bananatron is comprised of three major components. The [Bananatron injector](https://github.com/GarboMuffin/bananatron/blob/master/injector/injector.js) accepts a path to an Electron app, then modifies the app's code to add code to the start of the app's main script:
 
 ```js
 try {
@@ -190,7 +190,7 @@ const {app, BrowserWindow} = require('electron');
 // ...
 ```
 
-The injected code will run Bananatron's instrumentation module to install additional logging to the Electron API. A subset of the logs output by Bananatron are:
+The injected code will run [Bananatron's instrumentation module](https://github.com/GarboMuffin/bananatron/tree/master/instrumentation) to install additional logging to the Electron API. A subset of the logs output by Bananatron are:
 
 <style>
     [data-lang=json] {
@@ -204,7 +204,7 @@ The injected code will run Bananatron's instrumentation module to install additi
 {"Event":"did-navigate","URL":"https://example.com/"}
 ```
 
-These logs are not particularly human-readable, so the Bananatron report generator was created to ingest them and output a short report for humans:
+These logs are not particularly human-readable, so the Bananatron report generator (not yet open source) was created to ingest them and output a short report for humans:
 
 ```json
 "RiskyItems": [
