@@ -1,9 +1,31 @@
 {% extends "template.html" %}
 
+{% block head %}
+<title>{{ page.title }}</title>
+<style>
+  .content pre {
+    padding: 1rem;
+    overflow: auto;
+  }
+  .content img {
+    display: block;
+    margin: auto;
+    height: auto;
+    max-width: 100%;
+  }
+</style>
+{% endblock head %}
+
 {% block content %}
+
 <h1 class="title">
   {{ page.title }}
 </h1>
-<p class="subtitle"><strong>{{ page.date }}</strong></p>
-{{ page.content | safe }}
+
+<p><strong>{{ page.date }} on <a href="/">muffin.ink</a></strong></p>
+
+<div class="content">
+  {{ page.content | safe }}
+</div>
+
 {% endblock content %}

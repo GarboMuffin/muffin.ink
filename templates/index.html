@@ -33,18 +33,25 @@
   .project .links a {
     color: inherit;
   }
+  .ring {
+    text-align: center;
+  }
+  .ring a {
+    font-weight: bold;
+    text-decoration: none;
+  }
 </style>
 {% endblock head %}
 
 {% block content %}
 
-<!-- <h2>Blog</h2>
+<h2>Blog</h2>
 {% set blog_section = get_section(path="blog/_index.md") %}
 <ul>
   {% for page in blog_section.pages %}
-    <li><a href="{{ page.permalink | safe }}">{{ page.title }}</a></li>
+    <li><a href="{{ page.permalink | safe }}">{{ page.title }}</a> ({{ page.date }})</li>
   {% endfor %}
-</ul> -->
+</ul>
 
 <h2>Things I've worked on</h2>
 
@@ -88,5 +95,11 @@
   <!-- <li>Discord (not preferred): join <a href="https://discord.gg/qansgJ3yjs">this server</a> then DM @garbomuffin</li> -->
   <!-- <li><i>Messages sent on other platforms will not be seen</i></li> -->
 </ul>
+
+<div class="ring">
+  <a href="https://ring.umn.page/back?muffin.ink">&lt;-</a>
+  <span>blog ring</span>
+  <a href="https://ring.umn.page/next?muffin.ink">-&gt;</a>
+</div>
 
 {% endblock content %}
