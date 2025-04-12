@@ -192,13 +192,6 @@ const {app, BrowserWindow} = require('electron');
 
 The injected code will run [Bananatron's instrumentation module](https://github.com/GarboMuffin/bananatron/tree/master/instrumentation) to install additional logging to the Electron API. A subset of the logs output by Bananatron are:
 
-<style>
-    [data-lang=json] {
-        word-wrap: break-word;
-        text-wrap: wrap;
-    }
-</style>
-
 ```json
 {"WebPreferences":{"allowRunningInsecureContent":false,"contextIsolation":false,"disableDialogs":false,"disablePopups":false,"enableBlinkFeatures":"","enableWebSQL":true,"experimentalFeatures":false,"javascript":true,"nodeIntegration":true,"nodeIntegrationInSubFrames":false,"safeDialogs":false,"safeDialogsMessage":"","sandbox":false,"webSecurity":true,"webviewTag":false}}
 {"Event":"did-navigate","URL":"https://example.com/"}

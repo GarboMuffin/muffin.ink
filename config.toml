@@ -5,5 +5,10 @@ generate_feeds = true
 
 [markdown]
 highlight_code = true
+highlight_theme = "css"
+highlight_themes_css = [
+  { theme = "OneHalfLight", filename = "generated-themes/syntax-theme-light.css" },
+  { theme = "one-dark", filename = "generated-themes/syntax-theme-dark.css" },
+]
 
 [extra]
