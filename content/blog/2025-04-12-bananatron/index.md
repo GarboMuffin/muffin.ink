@@ -125,7 +125,7 @@ This process is, unfortunately, a lot of work and is very easy to get wrong.
 
 Inspectron uses a "static" approach. They compiled 14 different versions of Electron with modified implementations for certain Electron APIs to add additional instrumentation (logging). They then take an existing Electron app, such as Discord, and replaced the original Electron library files with an equivalent version of Electron with the additional instrumentation installed. This instrumented Electron was used to analyze around 100 apps, and several vulnerabilities were identified and fixed.
 
-As Inspectron relies on recompiling Electron, we say that Inspectron lives in the "implementaiton layer" as if Electron internals change, the Inspectron code will also need to change.
+As Inspectron relies on recompiling Electron, we say that Inspectron lives in the "implementation layer" as if Electron internals change, the Inspectron code will also need to change.
 
 <img src="inspectron.png" width="598" height="276">
 
@@ -153,7 +153,7 @@ This overwrites the openExternal method that the application can see without bre
 
 Our approach lives in the API layer as if Electron's implementation of the API changes, Bananatron does not need to change. This is exemplified by Bananatron's having a single version that has been tested to work on Electron versions ranging from 0.35.6 to 33.2.0. During this time, Electron changed from CoffeeScript, to JavaScript, and later to TypeScript. This transition does not affect Bananatron.  We extended the codebase to support more platforms, with more instrumentation, and a larger dataset of apps.
 
-Through Bananatron, we identifed **three real-world vulnerabilities**.
+Through Bananatron, we identified **three real-world vulnerabilities**.
 
 ### Example electron app
 
@@ -241,7 +241,7 @@ Recall that only the 3 major versions on the right are even receiving updates. T
 
 Electron lets apps choose whether the Chromium sandbox should be enabled to protect against malicious content even in the process of a bug in the renderer process that allows malicious code execution. **70% of apps disable the sandbox.**
 
-Context isolation provides a security boundary between the preload script and the web content. **54% of apps disable enable context isolation.**
+Context isolation provides a security boundary between the preload script and the web content. **54% of apps disable context isolation.**
 
 Node.js integration has been previously discussed and is a significant security risk. **50% of apps enable Node.js integration.**
 
@@ -295,7 +295,7 @@ app.on('certificate-error',
 
 **This disables HTTPS certificate validation entirely.**
 
-Any attacker with a man-in-the-middle on your network can abuse the lack of HTTPS certificate validation to to read all request parameters, including private API keys, by intercepting the connection and responding with a self-signed certificate. While Altair does show a warning whent his happens, this is too little too late as the attack has already completed.
+Any attacker with a man-in-the-middle on your network can abuse the lack of HTTPS certificate validation to read all request parameters, including private API keys, by intercepting the connection and responding with a self-signed certificate. While Altair does show a warning when this happens, this is too little too late as the attack has already completed.
 
 The attacker can also interfere with Altair's in-app payment system as it works by making a request from the web content to get a checkout URL to then open in the default browser. An attacker can intercept this and return their own URL to create an extremely convincing phishing page. After all, the checkout page was opened by the app, and there would be no reason to distrust the app. (The phishing page would be displayed in the browser so it would need a real HTTPS certificate, but the attacker can choose which URL to visit and obtaining an HTTPS certificate is trivial in 2025)
 
@@ -303,7 +303,7 @@ This bug was reported to Altair and fixed in v8.0.5. The bug was assigned CVE-20
 
 ### Case study: Buttercup
 
-[Buttercup](https://buttercup.pw) is a password manager built using Electron. Passwords are stored in an encrypted database. Because the database is encrypted, it is reasonably safe to upload it to cloud storage, so the app has builtin support for providers such as Dropbox and Google Drive.
+[Buttercup](https://buttercup.pw) is a password manager built using Electron. Passwords are stored in an encrypted database. Because the database is encrypted, it is reasonably safe to upload it to cloud storage, so the app has built-in support for providers such as Dropbox and Google Drive.
 
 <img src="buttercup.png" width="1085" height="742">
 
@@ -391,4 +391,4 @@ Of course, we did also analyze the Electron app I build ([TurboWarp Desktop](htt
 
 There is still some room for improvement, most notably the outdated Electron version (we already updated), but at least the most worrying settings such as Node.js integration are nowhere to be seen. Some of these, such as `CSP` (missing Content-Security-Policy) and `ExternalShellRisk` (usage of shell.openExternal) are not actionable due to functionality requirements while others, such as `IPCMessagesUnchecked` (not reading senderFrame), are only present due to (fixable) limitations in the instrumentation.
 
-We are confident we could have found more real security bugs in our dataset given more time. Hopefully, we can back to that soon :)
+We are confident we could have found more real security bugs in our dataset given more time. Hopefully, we get can back to that soon :)
