@@ -11,7 +11,7 @@ Last fall, we built [Bananatron](https://github.com/GarboMuffin/bananatron): a b
 It's necessary to first ensure a baseline background on the web platform. The primary languages are HTML, CSS, and JS (also WebAssembly). In contrast to the traditional desktop platform, it's built around a threat model such that websites are considered untrusted. For instance:
 
  - The only programming languages usable by websites are ([n](https://chromereleases.googleblog.com/2025/01/stable-channel-update-for-desktop_14.html)[o](https://chromereleases.googleblog.com/2024/05/stable-channel-update-for-desktop_23.html)[m](https://chromereleases.googleblog.com/2025/04/stable-channel-update-for-desktop_8.html)[i](https://www.mozilla.org/en-US/security/advisories/mfsa2025-07/)[n](https://www.mozilla.org/en-US/security/advisories/mfsa2025-01/)[a](https://www.mozilla.org/en-US/security/advisories/mfsa2024-63/)[l](https://support.apple.com/en-us/122379)[l](https://support.apple.com/en-us/122074)[y](https://support.apple.com/en-us/121846)) memory-safe.
- - The APIs provided to websites are very limited. For instance, there no web equivalent to `fopen` or `fread` in C. All file interactions go through [restricted APIs](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file) and require user interaction.
+ - The APIs provided to websites are very limited. For instance, there is no web equivalent to `fopen` or `fread` in C. All file interactions go through [restricted APIs](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file) and require user interaction.
  - The same-origin policy prevents unrelated websites from interacting with each other without explicit opt-in. This prevents evil.com from making requests to bank.com on your behalf.
  - Due to the constant stream of security vulnerabilities in web browsers, all browsers run web content in a [sandbox](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/design/sandbox.md) to reduce possible damage even in the event that a website has managed to achieve arbitrary code execution.
 
@@ -133,7 +133,7 @@ As Inspectron relies on recompiling Electron, we say that Inspectron lives in th
 
 We created our own auditing tool called Bananatron. It is [open source on GitHub](https://github.com/GarboMuffin/bananatron).
 
-We follow a similar to idea to Inspectron of instrumenting Electron APIs to identify unsafe configuration. Our contribution is that we use a "dynamic" approach that does not involve recompiling Electron. We instead patch Electron APIs at runtime using JavaScript code before the application starts.
+We follow a similar idea to Inspectron of instrumenting Electron APIs to identify unsafe configuration. Our contribution is that we use a "dynamic" approach that does not involve recompiling Electron. We instead patch Electron APIs at runtime using JavaScript code before the application starts.
 
 For instance, this is the code for Bananatron's instrumentation for `shell.openExternal`:
 
@@ -227,7 +227,7 @@ Through our dataset, we can analyze the security of Electron apps broadly and sp
 
 Electron currently releases a new major version [every 8 weeks](https://www.electronjs.org/docs/latest/tutorial/electron-timelines). The 3 most recent major versions of Electron receive a series of patch updates including bug fixes and security updates.
 
-We found that **60% of apps use a major version of Electron that is not receiving  security updates.** At the time of analysis (November 2024), the supported versions were Electron 31, 32, and 33.
+We found that **60% of apps use a major version of Electron that is not receiving security updates.** At the time of analysis (November 2024), the supported versions were Electron 31, 32, and 33.
 
 More worrying, **79% of apps were missing more than two months of Electron security updates**. This is in part because Electron is shipped as a static dependency of each app, so every app needs to release their own update to include the latest fixes. Few apps seem to bother.
 
