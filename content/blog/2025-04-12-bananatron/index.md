@@ -153,7 +153,7 @@ This overwrites the openExternal method that the application can see without bre
 
 Our approach lives in the API layer as if Electron's implementation of the API changes, Bananatron does not need to change. This is exemplified by Bananatron's having a single version that has been tested to work on Electron versions ranging from 0.35.6 to 33.2.0. During this time, Electron changed from CoffeeScript, to JavaScript, and later to TypeScript. This transition does not affect Bananatron.  We extended the codebase to support more platforms, with more instrumentation, and a larger dataset of apps.
 
-Through Bananatron, we identified **three real-world vulnerabilities**.
+Through Bananatron, we identified **two real-world vulnerabilities**.
 
 ### Example electron app
 
