@@ -15,13 +15,13 @@ It's necessary to first ensure a baseline background on the web platform. The pr
  - The same-origin policy prevents unrelated websites from interacting with each other without explicit opt-in. This prevents evil.com from making requests to bank.com on your behalf.
  - Due to the constant stream of security vulnerabilities in web browsers, all browsers run web content in a [sandbox](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/design/sandbox.md) to reduce possible damage even in the event that a website has managed to achieve arbitrary code execution.
 
-<img src="browsers.svg" width="491" height="291" loading="lazy">
+{{img(src="browsers.svg", alt="")}}
 
 ### Node.js
 
 [Node.js](https://nodejs.org/en) allows using JavaScript outside of a browser. Unlike browsers, Node.js runs directly on the operating system and trusts the code being run. There is no same-origin policy, no sandbox, no restricted APIs. Any C function can be exported for use by Node.js.
 
-<img src="nodejs.svg" width="220" height="164" loading="lazy">
+{{img(src="nodejs.svg", alt="")}}
 
 For example, in just four lines of Node.js you can delete all the files on your computer:
 
@@ -46,7 +46,7 @@ Electron offers many configuration options to developers, including whether to e
 
 Electron also supports preload scripts, which are scripts that a window will run before the rest of the web content will. Context isolation is an optional feature which runs the preload script in an isolated environment from web content. When context isolation is enabled, dangerous features such as IPC calls and Node.js integration (if enabled) are only available to the preload script. As long as the preload script only exposes APIs that are safe to use, context isolation can serve as a security boundary.
 
-<img src="electron.svg" width="490" height="346" loading="lazy">
+{{img(src='electron.svg', alt='')}}
 
 ### Node.js integration
 
@@ -127,7 +127,7 @@ Inspectron uses a "static" approach. They compiled 14 different versions of Elec
 
 As Inspectron relies on recompiling Electron, we say that Inspectron lives in the "implementation layer" as if Electron internals change, the Inspectron code will also need to change.
 
-<img src="inspectron.png" width="598" height="276" loading="lazy">
+{{img(src="inspectron.png", alt="")}}
 
 ## Bananatron
 
@@ -175,7 +175,7 @@ app.on('ready', () => {
 
 This produces:
 
-<img src="example.png" width="518" height="376" loading="lazy">
+{{img(src="example.png", alt="")}}
 
 Bananatron is comprised of three major components. The [Bananatron injector](https://github.com/GarboMuffin/bananatron/blob/master/injector/injector.js) accepts a path to an Electron app, then modifies the app's code to add code to the start of the app's main script:
 
@@ -214,7 +214,7 @@ This tells us that the app has an insecure setting for Node.js integration, cont
 
 We ran Bananatron on 112 apps. In total, we had a 98.2% success rate in instrumenting apps. Apps were audited on Windows, macOS, and Linux as Bananatron is cross-platform.
 
-<img src="dataset.png" width="808" height="773" loading="lazy">
+{{img(src="dataset.png", alt="")}}
 
 There were two failure cases:
 
@@ -233,7 +233,7 @@ More worrying, **79% of apps were missing more than two months of Electron secur
 
 Here is the full data in a simple graph: (or in a CSV: [electron-versions.csv](./electron-versions.csv))
 
-<img src="electron-versions.svg" width="600" height="371" loading="lazy">
+{{img(src="electron-versions.svg", alt="")}}
 
 Recall that only the 3 major versions on the right are even receiving updates. There is a significant long tail of apps using old versions of Electron.
 
@@ -251,7 +251,7 @@ Electron allows apps to disable the same-origin policy and other web security sy
 
 [Altair](https://altairgraphql.dev) is a desktop app for making [GraphQL](https://graphql.org) queries built using Electron. GraphQL is a query language for graph databases. It is supported by large companies such as Facebook and GitHub. Requests will often contain a private token or API key to authenticate the request.
 
-<img src="altair.png" width="1285" height="829" loading="lazy">
+{{img(src="altair.png", alt="")}}
 
 When Altair v8.0.3 was instrumented with Bananatron, the report generator found:
 
@@ -305,7 +305,7 @@ This bug was reported to Altair and fixed in v8.0.5. The bug was assigned CVE-20
 
 [Buttercup](https://buttercup.pw) is a password manager built using Electron. Passwords are stored in an encrypted database. Because the database is encrypted, it is reasonably safe to upload it to cloud storage, so the app has built-in support for providers such as Dropbox and Google Drive.
 
-<img src="buttercup.png" width="1085" height="742" loading="lazy">
+{{img(src="buttercup.png", alt="")}}
 
 When Buttercup v2.28.1 was instrumented with Bananatron, the report generator found:
 

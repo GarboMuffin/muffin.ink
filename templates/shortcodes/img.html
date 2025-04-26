@@ -1,0 +1,8 @@
+{% set meta = get_image_metadata(path=page.colocated_path ~ src) %}
+<img
+    loading="lazy"
+    alt="{{ alt }}"
+    src="{{ src }}"
+    width="{{ meta.width }}"
+    height="{{ meta.height }}"
+/>
