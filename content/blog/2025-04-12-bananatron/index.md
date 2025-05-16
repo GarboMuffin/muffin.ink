@@ -1,8 +1,10 @@
 +++
-title = "Auditing Electron apps with Bananatron"
+title = "Bananatron and the disappointing state of Electron app security"
 +++
 
-Last fall, we built [Bananatron](https://github.com/GarboMuffin/bananatron): a black-box auditing framework for Electron apps. We learned a lot about the (worryingly bad) security landscape of Electron apps and discovered a few real-world vulnerabilities. This is a blog-ified version of a presentation we gave about it last December to a small audience.
+Last fall, we built [Bananatron](https://github.com/GarboMuffin/bananatron), a black-box auditing framework for Electron apps. We used Bananatron to audit 112 popular Electron apps and discovered several real-world vulnerabilities. We also found that the overall landscape of Electron app security is overwhelmingly poor. A majority of apps enable insecure Electron features that automatically escalate common web vulnerabilities into catastrophic exploits, and few apps make use of all security protections that Electron provides.
+
+This is a blog-ified version of a presentation we gave about Bananatron last December to a small audience.
 
 ## Background
 
