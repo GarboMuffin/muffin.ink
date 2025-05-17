@@ -62,4 +62,4 @@ jobs:
       with:
         name: github-pages
     - name: Push
-      run: git push
+      run: git push --set-upstream origin gh-pages
