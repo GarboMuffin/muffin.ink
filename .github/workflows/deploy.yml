@@ -44,3 +44,22 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
+
+  upload-to-branch:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Clone
+      run: gh repo clone GarboMuffin/muffin.ink .
+      env:
+        GH_TOKEN: "${{ github.token }}"
+    - name: Switch branch
+      run: git checkout -B gh-pages
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: github-pages
+    - name: Push
+      run: git push
