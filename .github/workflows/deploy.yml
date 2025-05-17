@@ -55,6 +55,10 @@ jobs:
       run: gh repo clone GarboMuffin/muffin.ink .
       env:
         GH_TOKEN: "${{ github.token }}"
+    - name: Configure git
+      run: |
+        git config --global user.email "actions-user@users.noreply.github.com"
+        git config --global user.name "actions-user"
     - name: Switch branch
       run: git checkout -B gh-pages
     - name: Download artifact
