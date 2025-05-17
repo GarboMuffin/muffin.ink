@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf8">
+        <meta name="robots" content="noindex">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <pre id="log"></pre>
+
+        <script>
+            const log = document.getElementById('log');
+
+            window.addEventListener('touchstart', (e) => {
+                let message = 'TOUCHSTART\n';
+                message += `  touches (length = ${e.touches.length}):\n`;
+                for (let i = 0; i < e.touches.length; i++) {
+                    message += `    [${i}] identifier = ${e.touches[i].identifier}, x = ${e.touches[i].clientX}, y = ${e.touches[i].clientY}\n`;
+                }
+                message += `  changedTouches (length = ${e.changedTouches.length}):\n`;
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    message += `    [${i}] identifier = ${e.changedTouches[i].identifier}, x = ${e.changedTouches[i].clientX}, y = ${e.changedTouches[i].clientY}\n`;
+                }
+                log.textContent = message + '\n' + log.textContent;
+            });
+
+            window.addEventListener('touchmove', (e) => {
+                let message = 'TOUCHMOVE\n';
+                message += `  touches (length = ${e.touches.length}):\n`;
+                for (let i = 0; i < e.touches.length; i++) {
+                    message += `    [${i}] identifier = ${e.touches[i].identifier}, x = ${e.touches[i].clientX}, y = ${e.touches[i].clientY}\n`;
+                }
+                message += `  changedTouches (length = ${e.changedTouches.length}):\n`;
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    message += `    [${i}] identifier = ${e.changedTouches[i].identifier}, x = ${e.changedTouches[i].clientX}, y = ${e.changedTouches[i].clientY}\n`;
+                }
+                log.textContent = message + '\n' + log.textContent;
+            });
+
+            window.addEventListener('touchend', (e) => {
+                let message = 'TOUCHEND\n';
+                message += `  touches (length = ${e.touches.length}):\n`;
+                for (let i = 0; i < e.touches.length; i++) {
+                    message += `    [${i}] identifier = ${e.touches[i].identifier}, x = ${e.touches[i].clientX}, y = ${e.touches[i].clientY}\n`;
+                }
+                message += `  changedTouches (length = ${e.changedTouches.length}):\n`;
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    message += `    [${i}] identifier = ${e.changedTouches[i].identifier}, x = ${e.changedTouches[i].clientX}, y = ${e.changedTouches[i].clientY}\n`;
+                }
+                log.textContent = message + '\n' + log.textContent;
+            });
+        </script>
+    </body>
+</html>

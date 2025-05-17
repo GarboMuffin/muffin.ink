@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf8">
+        <meta name="robots" content="noindex">
+    </head>
+    <body>
+        <script>
+            const update = () => {
+                const color = location.hash;
+                document.body.style.backgroundColor = color;
+            };
+            addEventListener('hashchange', update);
+            addEventListener('mousedown', () => {
+                document.documentElement.requestFullscreen();
+            })
+            update();
+        </script>
+    </body>
+</html>
